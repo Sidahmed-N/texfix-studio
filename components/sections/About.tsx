@@ -35,12 +35,12 @@ interface ActivityItem {
 }
 
 const agencyActivity: ActivityItem[] = [
-  { name: 'Deployment live',        description: 'texfix.dev Â· v2.1.0 shipped',        icon: 'ðŸš€', color: '#00C9A7', time: 'just now' },
-  { name: 'Sprint completed',       description: 'E-commerce platform Â· Phase 2',       icon: 'âœ…', color: '#3B82F6', time: '2m ago'   },
-  { name: 'Client approved',        description: 'Homepage redesign Â· Final review',    icon: 'ðŸ’¬', color: '#FFB800', time: '5m ago'   },
-  { name: 'Perf. milestone hit',    description: '98 / 100 Lighthouse Â· CWV green',     icon: 'âš¡', color: '#8B5CF6', time: '12m ago'  },
-  { name: 'Security audit passed',  description: '0 vulnerabilities Â· OWASP clean',    icon: 'ðŸ”’', color: '#10B981', time: '1h ago'   },
-  { name: 'New project kicked off', description: 'SaaS dashboard Â· 8-week roadmap',    icon: 'ðŸ“‹', color: '#F59E0B', time: '2h ago'   },
+  { name: 'Deployment live',        description: 'texfix.dev · v2.1.0 shipped',        icon: '🚀', color: '#00C9A7', time: 'just now' },
+  { name: 'Sprint completed',       description: 'E-commerce platform · Phase 2',       icon: '✅', color: '#3B82F6', time: '2m ago'   },
+  { name: 'Client approved',        description: 'Homepage redesign · Final review',    icon: '💬', color: '#FFB800', time: '5m ago'   },
+  { name: 'Perf. milestone hit',    description: '98 / 100 Lighthouse · CWV green',     icon: '⚡', color: '#8B5CF6', time: '12m ago'  },
+  { name: 'Security audit passed',  description: '0 vulnerabilities · OWASP clean',    icon: '🔒', color: '#10B981', time: '1h ago'   },
+  { name: 'New project kicked off', description: 'SaaS dashboard · 8-week roadmap',    icon: '📋', color: '#F59E0B', time: '2h ago'   },
 ]
 
 function AgencyActivity({ name, description, icon, color, time }: ActivityItem) {
@@ -64,7 +64,7 @@ function AgencyActivity({ name, description, icon, color, time }: ActivityItem) 
         <div className="flex flex-col overflow-hidden flex-1">
           <div className="flex items-center gap-1 text-sm font-medium text-white">
             <span className="truncate">{name}</span>
-            <span className="text-zinc-600 flex-shrink-0">Â·</span>
+            <span className="text-zinc-600 flex-shrink-0">·</span>
             <span className="text-xs text-zinc-500 flex-shrink-0 whitespace-nowrap">{time}</span>
           </div>
           <p className="text-xs text-zinc-400 truncate">{description}</p>
