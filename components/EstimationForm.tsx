@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useRef, useState, useTransition } from 'react'
 import gsap from 'gsap'
 import {
   SERVICES,
@@ -12,6 +12,7 @@ import {
   type ServiceId,
 } from '@/lib/form-data'
 import { calculatePrice } from '@/lib/pricing'
+import { sendConsultation } from '@/app/actions/send-consultation'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -188,6 +189,14 @@ export default function EstimationForm() {
   const [budgetSent,     setBudgetSent]     = useState(false)
   const [customFeature,  setCustomFeature]  = useState('')
   const [showCustomInput, setShowCustomInput] = useState(false)
+
+  const [contactName,  setContactName]  = useState('')
+  const [contactEmail, setContactEmail] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
+  const [contactMsg,   setContactMsg]   = useState('')
+  const [contactStatus, setContactStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [contactError, setContactError] = useState('')
+  const [isPending, startTransition] = useTransition()
 
   const contentRef = useRef<HTMLDivElement>(null)
 
@@ -536,10 +545,10 @@ export default function EstimationForm() {
               </div>
             )}
 
-            {/* Outcome: talk */}
+            {/* Outcome: talk — inline contact form */}
             {outcome === 'talk' && (
               <div
-                className="rounded-xl p-6 text-center space-y-4"
+                className="rounded-xl p-6 space-y-5"
                 style={{
                   background: 'linear-gradient(160deg, rgba(59,130,246,0.16) 0%, rgba(59,130,246,0.04) 60%, rgba(0,0,0,0.20) 100%)',
                   border: '1px solid rgba(59,130,246,0.30)',
@@ -547,33 +556,161 @@ export default function EstimationForm() {
                   backdropFilter: 'blur(14px)',
                 }}
               >
-                <p className="text-white font-medium text-base leading-relaxed">
-                  Perfect! Book a free consultation and we&apos;ll get started.
-                </p>
-                <p className="text-zinc-500 text-sm">
-                  No commitment required — we&apos;ll discuss your project in detail.
-                </p>
-                <a
-                  href="mailto:texfix.info@gmail.com"
-                  className="inline-flex items-center gap-2 px-7 py-3 text-white rounded-lg font-medium text-sm transition-all duration-200"
-                  style={{
-                    background: 'linear-gradient(160deg, #60a5fa 0%, #2563eb 100%)',
-                    border: '1px solid rgba(59,130,246,0.6)',
-                    boxShadow: '0 0 24px rgba(59,130,246,0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
-                  }}
-                >
-                  Book Free Consultation
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setOutcome(null)}
-                  className="block mx-auto text-zinc-700 hover:text-zinc-400 text-xs transition-colors"
-                >
-                  ← Go back
-                </button>
+                {contactStatus === 'sent' ? (
+                  <div className="text-center space-y-3 py-4">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center mx-auto"
+                      style={{
+                        background: 'linear-gradient(160deg, rgba(34,197,94,0.20) 0%, rgba(22,163,74,0.15) 100%)',
+                        border: '1px solid rgba(34,197,94,0.35)',
+                        boxShadow: '0 0 20px rgba(34,197,94,0.25)',
+                      }}
+                    >
+                      <svg className="w-6 h-6 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <p className="text-white font-medium text-base">Request sent!</p>
+                    <p className="text-zinc-400 text-sm leading-relaxed">
+                      We&apos;ll review your project and get back to you within 24 hours.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-center space-y-1">
+                      <p className="text-white font-medium text-base leading-relaxed">
+                        Book a free consultation
+                      </p>
+                      <p className="text-zinc-500 text-sm">
+                        No commitment — we&apos;ll discuss your project in detail.
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-zinc-500 text-xs uppercase tracking-widest mb-1.5">
+                            Name <span className="text-blue-400">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={contactName}
+                            onChange={e => setContactName(e.target.value)}
+                            placeholder="Your full name"
+                            disabled={contactStatus === 'sending'}
+                            className="ef-budget-input w-full"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-zinc-500 text-xs uppercase tracking-widest mb-1.5">
+                            Email <span className="text-blue-400">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            value={contactEmail}
+                            onChange={e => setContactEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            disabled={contactStatus === 'sending'}
+                            className="ef-budget-input w-full"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-zinc-500 text-xs uppercase tracking-widest mb-1.5">
+                          Phone / WhatsApp <span className="text-zinc-700 normal-case tracking-normal">(optional)</span>
+                        </label>
+                        <input
+                          type="tel"
+                          value={contactPhone}
+                          onChange={e => setContactPhone(e.target.value)}
+                          placeholder="+213 XXX XXX XXX"
+                          disabled={contactStatus === 'sending'}
+                          className="ef-budget-input w-full"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-zinc-500 text-xs uppercase tracking-widest mb-1.5">
+                          Message <span className="text-zinc-700 normal-case tracking-normal">(optional)</span>
+                        </label>
+                        <textarea
+                          value={contactMsg}
+                          onChange={e => setContactMsg(e.target.value)}
+                          placeholder="Tell us about your project, timeline, or any questions..."
+                          rows={3}
+                          disabled={contactStatus === 'sending'}
+                          className="ef-budget-input w-full resize-none"
+                        />
+                      </div>
+                    </div>
+
+                    {contactStatus === 'error' && contactError && (
+                      <p className="text-red-400/90 text-xs text-center">{contactError}</p>
+                    )}
+
+                    <div className="flex flex-col items-center gap-3 pt-1">
+                      <button
+                        type="button"
+                        disabled={!contactName.trim() || !contactEmail.trim() || contactStatus === 'sending'}
+                        onClick={() => {
+                          setContactStatus('sending')
+                          setContactError('')
+                          startTransition(async () => {
+                            const result = await sendConsultation({
+                              name: contactName.trim(),
+                              email: contactEmail.trim(),
+                              phone: contactPhone.trim(),
+                              message: contactMsg.trim(),
+                              service: serviceLabel,
+                              projectType: form.projectType ?? '',
+                              features: form.features,
+                              companyType: form.companyType ?? '',
+                              priceMin: price?.min ?? null,
+                              priceMax: price?.max ?? null,
+                            })
+                            if (result.ok) {
+                              setContactStatus('sent')
+                            } else {
+                              setContactStatus('error')
+                              setContactError(result.error || 'Something went wrong.')
+                            }
+                          })
+                        }}
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 text-white rounded-lg font-medium text-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                        style={{
+                          background: 'linear-gradient(160deg, #60a5fa 0%, #2563eb 100%)',
+                          border: '1px solid rgba(59,130,246,0.6)',
+                          boxShadow: '0 0 24px rgba(59,130,246,0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
+                        }}
+                      >
+                        {contactStatus === 'sending' ? (
+                          <>
+                            <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            Send Request
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setOutcome(null); setContactStatus('idle'); setContactError('') }}
+                        className="text-zinc-700 hover:text-zinc-400 text-xs transition-colors"
+                      >
+                        ← Go back
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
 
