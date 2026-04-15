@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import gsap from 'gsap'
 
 export default function PageTransition() {
   const overlayRef   = useRef<HTMLDivElement>(null)
@@ -14,21 +13,21 @@ export default function PageTransition() {
   useEffect(() => {
     const el = overlayRef.current
     if (!el) return
-    // Ensure overlay covers screen before animating away
-    gsap.set(el, { scaleY: 1, transformOrigin: 'top', pointerEvents: 'none' })
-    gsap.to(el, {
-      scaleY: 0,
-      duration: 1,
-      ease: 'power4.inOut',
-      delay: 0.05,
-      onComplete: () => { navigating.current = false },
+    import('gsap').then(({ gsap }) => {
+      gsap.set(el, { scaleY: 1, transformOrigin: 'top', pointerEvents: 'none' })
+      gsap.to(el, {
+        scaleY: 0,
+        duration: 1,
+        ease: 'power4.inOut',
+        delay: 0.05,
+        onComplete: () => { navigating.current = false },
+      })
     })
   }, [pathname])
 
   // ── Global click interceptor ───────────────────────────────────────────────
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      // Already handled (hash/prevented by other handler)
       if (e.defaultPrevented) return
 
       const anchor = (e.target as Element).closest<HTMLAnchorElement>('a')
@@ -37,7 +36,6 @@ export default function PageTransition() {
       const href = anchor.getAttribute('href')
       if (!href) return
 
-      // Only internal page routes (not hash, not external, not same page)
       if (!href.startsWith('/')) return
       if (anchor.target === '_blank') return
       if (href === pathname) return
@@ -49,13 +47,14 @@ export default function PageTransition() {
       const el = overlayRef.current
       if (!el) { router.push(href); return }
 
-      // Cover: scaleY 0 → 1 from bottom
-      gsap.set(el, { scaleY: 0, transformOrigin: 'bottom', pointerEvents: 'all' })
-      gsap.to(el, {
-        scaleY: 1,
-        duration: 1,
-        ease: 'power4.inOut',
-        onComplete: () => { router.push(href) },
+      import('gsap').then(({ gsap }) => {
+        gsap.set(el, { scaleY: 0, transformOrigin: 'bottom', pointerEvents: 'all' })
+        gsap.to(el, {
+          scaleY: 1,
+          duration: 1,
+          ease: 'power4.inOut',
+          onComplete: () => { router.push(href) },
+        })
       })
     }
 

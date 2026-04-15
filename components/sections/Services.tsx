@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Icon } from '@iconify/react'
 import gsap from 'gsap'
-import AnimatedBadge from '@/components/ui/animated-badge'
-import { useReveal, wordStyle } from '@/hooks/use-reveal'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { Code2, Smartphone, Zap, BarChart2, Plus, Check, type LucideIcon } from 'lucide-react'
+import AnimatedBadge from '@/components/ui/animated-badge'
+import { useReveal } from '@/hooks/use-reveal'
 import { HackerBackground } from '@/registry/eldoraui/hacker-background'
 import { AnimatedGridPattern } from '@/components/ui/animated-grid-pattern'
 import { cn } from '@/lib/utils'
@@ -16,7 +16,7 @@ const services = [
     num: '01',
     title: 'Custom Software Development',
     desc: 'Bespoke enterprise-grade software engineered for your exact requirements.',
-    icon: 'lucide:code-2',
+    icon: Code2,
     bullets: [
       'Enterprise ERP & CRM platforms',
       'API development & integrations',
@@ -30,7 +30,7 @@ const services = [
     num: '02',
     title: 'Web & Mobile Applications',
     desc: 'High-performance web and mobile apps built for scale and user experience.',
-    icon: 'lucide:smartphone',
+    icon: Smartphone,
     bullets: [
       'Progressive Web Apps (PWA)',
       'Cross-platform mobile (React Native)',
@@ -44,7 +44,7 @@ const services = [
     num: '03',
     title: 'Business Automation',
     desc: 'Automate repetitive workflows to save time, reduce errors, and cut costs.',
-    icon: 'lucide:zap',
+    icon: Zap,
     bullets: [
       'Invoice & payment processing',
       'Employee onboarding workflows',
@@ -58,7 +58,7 @@ const services = [
     num: '04',
     title: 'Data Analytics & Dashboards',
     desc: 'Turn raw data into real-time actionable business intelligence.',
-    icon: 'lucide:bar-chart-2',
+    icon: BarChart2,
     bullets: [
       'Real-time KPI dashboards',
       'Sales & conversion analytics',
@@ -78,7 +78,6 @@ export default function Services() {
   const isFlippedRef = useRef(false)
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null)
   const [mobileExpanded, setMobileExpanded] = useState<number | null>(null)
-  const { ref: revealRef, visible } = useReveal(0.2)
   const { ref: mobileRevealRef, visible: mobileVisible } = useReveal(0.2)
 
   const handleCardClick = (i: number) => {
@@ -168,7 +167,7 @@ export default function Services() {
       return () => {}
     })
 
-    return () => mm.revert()
+    return () => { mm.revert() }
   }, [])
 
   return (
@@ -184,24 +183,11 @@ export default function Services() {
             <AnimatedBadge text="What We Do" color="#3B82F6" />
           </div>
           <div ref={headerRef}>
-            {/* @ts-expect-error ref typing */}
-            <h2 ref={revealRef} className="font-display text-5xl font-medium leading-tight uppercase">
-              <span className="block">
-                {['Services', 'Built', 'for'].map((w, i) => (
-                  <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                    <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500" style={wordStyle(visible, i * 0.12)}>{w}</span>
-                  </span>
-                ))}
-              </span>
-              <span className="block">
-                {['Real', 'Business', 'Outcomes'].map((w, i) => (
-                  <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                    <span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700" style={wordStyle(visible, 0.36 + i * 0.12)}>{w}</span>
-                  </span>
-                ))}
-              </span>
+            <h2 className="font-display text-5xl font-medium leading-tight uppercase">
+              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">Services Built for</span>
+              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700">Real Business Outcomes</span>
             </h2>
-            <p className="mt-4 text-zinc-400 text-sm max-w-lg mx-auto text-center" style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(20px)', transition: visible ? 'opacity 0.8s ease 0.7s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s' : 'none' }}>
+            <p className="mt-4 text-zinc-400 text-sm max-w-lg mx-auto text-center">
               Custom software, web &amp; mobile applications, and intelligent automation — engineered to scale your operations and accelerate growth.
             </p>
           </div>
@@ -293,14 +279,14 @@ export default function Services() {
                         transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)',
                       }}
                     >
-                      <Icon icon="lucide:plus" className="text-neutral-600 text-sm" />
+                      <Plus className="text-neutral-600 w-3.5 h-3.5" />
                     </div>
                   </div>
-                  <Icon
-                    icon={s.icon}
+                  <s.icon
                     style={{
-                      fontSize: expandedIdx === i ? '2rem' : '1.75rem',
-                      transition: 'font-size 0.3s ease, color 0.3s ease',
+                      width: expandedIdx === i ? '2rem' : '1.75rem',
+                      height: expandedIdx === i ? '2rem' : '1.75rem',
+                      transition: 'width 0.3s ease, height 0.3s ease, color 0.3s ease',
                       color: expandedIdx === i ? 'rgb(59 130 246 / 0.7)' : 'rgb(64 64 64)',
                       marginBottom: '0.75rem',
                       display: 'block',
@@ -363,7 +349,7 @@ export default function Services() {
                               }}
                               className="flex items-start gap-2 text-[13px] text-neutral-400"
                             >
-                              <Icon icon="lucide:check" className="text-signal/50 mt-0.5 shrink-0 text-[11px]" />
+                              <Check className="text-signal/50 mt-0.5 shrink-0 w-[11px] h-[11px]" />
                               {b}
                             </motion.li>
                           ))}
@@ -399,21 +385,9 @@ export default function Services() {
           </div>
           {/* @ts-expect-error ref typing */}
           <h2 ref={mobileRevealRef} className="font-display text-4xl font-medium leading-tight mb-3 uppercase text-center">
-            <span className="block">
-              {['Services', 'Built', 'for'].map((w, i) => (
-                <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500" style={wordStyle(mobileVisible, i * 0.12)}>{w}</span>
-                </span>
-              ))}
-            </span>
-            <span className="block">
-              {['Real', 'Business', 'Outcomes'].map((w, i) => (
-                <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700" style={wordStyle(mobileVisible, 0.36 + i * 0.12)}>{w}</span>
-                </span>
-              ))}
-            </span>
-          </h2>
+              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">Services Built for</span>
+              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700">Real Business Outcomes</span>
+            </h2>
           <p className="text-zinc-400 text-sm mb-10 text-center" style={{ opacity: mobileVisible ? 1 : 0, transform: mobileVisible ? 'translateY(0)' : 'translateY(20px)', transition: mobileVisible ? 'opacity 0.8s ease 0.7s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s' : 'none' }}>
             Custom software, web &amp; mobile applications, and intelligent automation — engineered to scale your operations and accelerate growth.
           </p>
@@ -446,13 +420,13 @@ export default function Services() {
                   <div className="flex items-center justify-between mb-3">
                     <span className="font-mono text-[10px] text-white/25">( {s.num} )</span>
                     <div style={{ transform: mobileExpanded === i ? 'rotate(45deg)' : 'rotate(0deg)', transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
-                      <Icon icon="lucide:plus" className="text-neutral-600 text-sm" />
+                      <Plus className="text-neutral-600 w-3.5 h-3.5" />
                     </div>
                   </div>
-                  <Icon
-                    icon={s.icon}
+                  <s.icon
                     style={{
-                      fontSize: '1.75rem',
+                      width: '1.75rem',
+                      height: '1.75rem',
                       color: mobileExpanded === i ? 'rgb(59 130 246 / 0.7)' : 'rgb(64 64 64)',
                       marginBottom: '0.75rem',
                       display: 'block',
@@ -499,7 +473,7 @@ export default function Services() {
                               }}
                               className="flex items-start gap-2 text-[13px] text-neutral-400"
                             >
-                              <Icon icon="lucide:check" className="text-signal/50 mt-0.5 shrink-0 text-[11px]" />
+                              <Check className="text-signal/50 mt-0.5 shrink-0 w-[11px] h-[11px]" />
                               {b}
                             </motion.li>
                           ))}

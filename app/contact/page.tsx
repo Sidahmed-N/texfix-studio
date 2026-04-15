@@ -84,7 +84,6 @@ export default function ContactPage() {
                         }`}
                         style={{
                           fontSize: 'clamp(3.2rem, 8.5vw, 7.5rem)',
-                          animation: `wordReveal 1.6s cubic-bezier(0.16,1,0.3,1) ${delay}s both`,
                         }}
                       >
                         {word}

@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 
 interface ThreeDMarqueeProps {
   items: React.ReactNode[]
@@ -17,8 +17,27 @@ export function ThreeDMarquee({ items, className, columns = 4 }: ThreeDMarqueePr
     items.slice(i * perCol, (i + 1) * perCol),
   )
 
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const colEls = el.querySelectorAll<HTMLElement>('.marquee-vertical, .marquee-vertical-reverse')
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        colEls.forEach(c => {
+          c.style.animationPlayState = entry.isIntersecting ? 'running' : 'paused'
+        })
+      },
+      { threshold: 0 },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
   return (
     <div
+      ref={containerRef}
       className={cn('overflow-hidden', className)}
       style={{ perspective: '900px' }}
     >

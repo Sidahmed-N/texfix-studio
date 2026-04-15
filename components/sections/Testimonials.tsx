@@ -1,8 +1,8 @@
 'use client'
 import { cn } from '@/lib/utils'
-import { Icon } from '@iconify/react'
+import { ShoppingBag, Globe, LayoutDashboard, PanelLeft, AppWindow, Store, type LucideIcon } from 'lucide-react'
 import AnimatedBadge from '@/components/ui/animated-badge'
-import { useReveal, wordStyle } from '@/hooks/use-reveal'
+
 
 const testimonials = [
   {
@@ -10,42 +10,42 @@ const testimonials = [
     handle: 'Fondateur',
     avatar: 'KB',
     body: 'TexFix nous a construit une boutique en ligne sur mesure qui a complètement changé notre façon de vendre. Simple, rapide, et exactement ce dont on avait besoin.',
-    metric: { icon: 'lucide:shopping-bag', label: 'E-commerce' },
+    metric: { icon: ShoppingBag, label: 'E-commerce' },
   },
   {
     name: 'James Whitfield',
     handle: 'Founder',
     avatar: 'JW',
     body: "I came with a rough idea and they turned it into a full web platform. The attention to detail and the quality of the code genuinely surprised me. Couldn't ask for better.",
-    metric: { icon: 'lucide:globe', label: 'Web Platform' },
+    metric: { icon: Globe, label: 'Web Platform' },
   },
   {
     name: 'Yasmine Hadj',
     handle: 'Directrice',
     avatar: 'YH',
     body: "Notre plateforme de gestion a été livrée dans les délais et fonctionne parfaitement. L'équipe a vraiment pris le temps de comprendre notre activité avant de commencer.",
-    metric: { icon: 'lucide:layout-dashboard', label: 'Dashboard' },
+    metric: { icon: LayoutDashboard, label: 'Dashboard' },
   },
   {
     name: 'Lena Hoffmann',
     handle: 'Co-founder',
     avatar: 'LH',
     body: "TexFix built our client portal from scratch and it works flawlessly. Our users love how intuitive it feels, and we've had zero issues since launch. Impressive work.",
-    metric: { icon: 'lucide:panel-left', label: 'Client Portal' },
+    metric: { icon: PanelLeft, label: 'Client Portal' },
   },
   {
     name: 'Sofiane Meziane',
     handle: 'CEO',
     avatar: 'SM',
     body: "L'application web qu'ils ont développée pour notre logistique a simplifié des processus qu'on gérait manuellement depuis des années. Un vrai gain au quotidien.",
-    metric: { icon: 'lucide:app-window', label: 'Web App' },
+    metric: { icon: AppWindow, label: 'Web App' },
   },
   {
     name: 'Omar Khalil',
     handle: 'Founder',
     avatar: 'OK',
     body: "They delivered a polished e-commerce site that represents our brand perfectly. The whole process was smooth, communication was great, and the result speaks for itself.",
-    metric: { icon: 'lucide:store', label: 'E-commerce' },
+    metric: { icon: Store, label: 'E-commerce' },
   },
 ]
 
@@ -70,7 +70,7 @@ function TestimonialCard({
         </div>
         <div className="ml-auto flex-shrink-0 flex flex-col items-center gap-1">
           <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-            <Icon icon={metric.icon} className="w-4 h-4 text-blue-400" />
+            <metric.icon className="w-4 h-4 text-blue-400" />
           </div>
           <div className="text-[9px] text-zinc-600 font-mono tracking-wide uppercase">{metric.label}</div>
         </div>
@@ -124,7 +124,6 @@ function SeamlessMarquee({
 }
 
 export default function Testimonials() {
-  const { ref: revealRef, visible } = useReveal(0.2)
   return (
     <section id="testimonials" className="py-32 relative bg-black/80">
       <div className="absolute inset-0 pointer-events-none z-0">
@@ -136,24 +135,11 @@ export default function Testimonials() {
           <div className="flex justify-center mb-2">
             <AnimatedBadge text="Client Results" color="#3B82F6" />
           </div>
-          {/* @ts-expect-error ref typing */}
-          <h2 ref={revealRef} className="font-display text-4xl font-medium text-center uppercase">
-            <span className="block">
-              {['Real', 'Results,', 'Real'].map((w, i) => (
-                <span key={i} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500" style={wordStyle(visible, i * 0.12)}>{w}</span>
-                </span>
-              ))}
-            </span>
-            <span className="block">
-              {['Clients'].map((w, i) => (
-                <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700" style={wordStyle(visible, 0.36 + i * 0.12)}>{w}</span>
-                </span>
-              ))}
-            </span>
+          <h2 className="font-display text-4xl font-medium text-center uppercase">
+            <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">Real Results, Real</span>
+            <span className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700">Clients</span>
           </h2>
-          <p className="mt-4 text-zinc-400 text-sm max-w-xl mx-auto text-center" style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(20px)', transition: visible ? 'opacity 0.8s ease 0.6s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s' : 'none' }}>
+          <p className="mt-4 text-zinc-400 text-sm max-w-xl mx-auto text-center">
             Businesses across industries trust TexFix to deliver software that performs. Here&apos;s what our clients say after working with us.
           </p>
         </div>

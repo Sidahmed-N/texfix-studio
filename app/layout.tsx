@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Space_Grotesk, JetBrains_Mono, DM_Sans, Geist, Plus_Jakarta_Sans } from 'next/font/google'
+import { JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 import AuraBackground from '@/components/AuraBackground'
@@ -13,29 +13,16 @@ import { cn } from "@/lib/utils";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-display',
-  weight: ['300', '400', '500', '600', '700'],
-})
-
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
-  weight: ['300', '400', '500', '700'],
-})
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  variable: '--font-dmsans',
+  display: 'swap',
 })
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   variable: '--font-hero',
-  weight: ['200', '300', '400', '500', '600', '700', '800'],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -78,9 +65,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={cn("bg-black", "antialiased", spaceGrotesk.variable, jetbrainsMono.variable, dmSans.variable, plusJakarta.variable, "font-sans", geist.variable)}
+      className={cn("bg-black", "antialiased", jetbrainsMono.variable, plusJakarta.variable, "font-sans")}
     >
       <head>
+        {/* Preconnect to external CDN for UnicornStudio background */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
         {/* Hide preloader before React hydrates if already seen — prevents flash */}
         <script dangerouslySetInnerHTML={{ __html: `if(sessionStorage.getItem('preloader-shown')){document.head.insertAdjacentHTML('beforeend','<style>.preloader,.split-overlay,.tags-overlay{display:none!important}</style>')}` }} />
       </head>

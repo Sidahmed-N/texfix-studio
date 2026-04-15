@@ -17,8 +17,6 @@ export function AnimatedShinyButton({
   return (
     <>
       <style jsx>{`
-        @import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,500&display=swap");
-
         @property --gradient-angle {
           syntax: "<angle>";
           initial-value: 0deg;
@@ -61,7 +59,7 @@ export function AnimatedShinyButton({
           cursor: pointer;
           outline-offset: 4px;
           padding: 0.75rem 1.2rem;
-          font-family: "Inter", sans-serif;
+          font-family: inherit;
           font-size: 0.875rem;
           line-height: 1.2;
           font-weight: 500;

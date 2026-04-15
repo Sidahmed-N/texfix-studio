@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
 import { cn } from '@/lib/utils'
 import { Home, User, Briefcase, Mail } from 'lucide-react'
 
@@ -26,15 +25,18 @@ export default function Navbar() {
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768)
     check()
-    window.addEventListener('resize', check)
+    window.addEventListener('resize', check, { passive: true })
     return () => window.removeEventListener('resize', check)
   }, [])
 
   useEffect(() => {
     const onScroll = () => {
-      if (!isMenuOpen) setIsSticky(window.scrollY >= 100)
+      if (!isMenuOpen) setIsSticky(prev => {
+        const next = window.scrollY >= 100
+        return prev === next ? prev : next
+      })
     }
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [isMenuOpen])
 
@@ -122,76 +124,90 @@ export default function Navbar() {
 
   const collapsed = isMobile || isSticky
 
+  // Track linksVisible with a delay on collapse to allow the CSS fade-out transition to play
+  const [linksVisible, setLinksVisible] = useState(!collapsed)
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    if (collapsed) { t = setTimeout(() => setLinksVisible(false), 250) }
+    else { setLinksVisible(true) }
+    return () => clearTimeout(t)
+  }, [collapsed])
+
   return (
     <>
       <div className="fixed z-50 w-full pointer-events-none">
-        <motion.nav
+        <nav
           ref={navRef}
-          initial={false}
           className={cn(
             'pointer-events-auto flex justify-center items-center',
-            'backdrop-blur-2xl border',
+            'backdrop-blur-md border',
             'shadow-[inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.4),0_16px_48px_rgba(0,0,0,0.7),0_0_0_1px_rgba(59,130,246,0.08)]',
             'bg-gradient-to-b from-white/10 to-white/4 border-white/10',
             'fixed',
           )}
-          animate={{
+          style={{
             height:       collapsed ? 64   : 68,
             width:        collapsed ? 64   : 440,
             borderRadius: collapsed ? 9999 : 14,
             top:          collapsed ? 24   : 28,
-            left:         collapsed ? 24   : '50%',
-            x:            collapsed ? 0    : '-50%',
+            left:         0,
+            transform:    collapsed ? 'translateX(24px)' : 'translateX(calc(50vw - 220px))',
+            transition:   'height 0.45s cubic-bezier(0.34,1.56,0.64,1), width 0.5s cubic-bezier(0.34,1.56,0.64,1), border-radius 0.45s cubic-bezier(0.34,1.56,0.64,1), transform 0.5s cubic-bezier(0.34,1.56,0.64,1)',
           }}
-          transition={{ type: 'spring', stiffness: 260, damping: 32 }}
         >
-          <AnimatePresence>
-            {!collapsed && NAV_LINKS.map((link, i) => (
-              <motion.a
-                key={link.id}
-                href={link.href}
-                onClick={(e) => handleLinkClick(link.href, e)}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ delay: i * 0.05, type: 'spring', stiffness: 300, damping: 28 }}
-                className="px-4 py-2 text-[12px] font-sans uppercase tracking-widest text-zinc-400 hover:text-white transition-colors duration-200 whitespace-nowrap flex items-center gap-1.5"
-              >
-                {React.createElement(NAV_ICONS[i], { className: 'w-3 h-3 opacity-60' })}
-                {link.label}
-              </motion.a>
-            ))}
-          </AnimatePresence>
+          {linksVisible && NAV_LINKS.map((link, i) => (
+            <a
+              key={link.id}
+              href={link.href}
+              onClick={(e) => handleLinkClick(link.href, e)}
+              style={{
+                opacity:       collapsed ? 0 : 1,
+                transform:     collapsed ? 'scale(0.8)' : 'scale(1)',
+                transition:    `opacity 0.2s ease ${i * 0.05}s, transform 0.2s ease ${i * 0.05}s, color 0.2s ease`,
+                pointerEvents: collapsed ? 'none' : 'auto',
+              }}
+              className="px-4 py-2 text-[12px] font-sans uppercase tracking-widest text-zinc-400 hover:text-white whitespace-nowrap flex items-center gap-1.5"
+            >
+              {React.createElement(NAV_ICONS[i], { className: 'w-3 h-3 opacity-60' })}
+              {link.label}
+            </a>
+          ))}
 
-          <motion.button
+          <button
             onClick={handleMenuToggle}
             aria-label="Toggle menu"
             className={cn(
               'absolute w-[52px] h-[52px] rounded-full outline-none border cursor-pointer',
               'bg-gradient-to-b from-white/12 to-white/4 border-white/10',
               'shadow-[inset_0_1px_0_rgba(255,255,255,0.15),inset_0_-1px_0_rgba(0,0,0,0.3),0_8px_24px_rgba(0,0,0,0.5),0_0_0_1px_rgba(59,130,246,0.10)]',
-              'hover:from-white/18 hover:to-white/8 hover:border-white/15 transition-all duration-200 backdrop-blur-2xl',
+              'hover:from-white/18 hover:to-white/8 hover:border-white/15 transition-[transform,background,border-color,box-shadow] duration-200 backdrop-blur-md',
               collapsed ? 'flex' : 'flex md:hidden',
               'flex-col items-center justify-center gap-[5px]',
             )}
           >
-            <motion.span
+            <span
               className="block w-4 h-[1.5px] bg-zinc-300 origin-center"
-              animate={{ rotate: isMenuOpen ? 45 : 0, y: isMenuOpen ? 6.5 : 0 }}
-              transition={{ duration: 0.4, ease: [0.87, 0, 0.13, 1] }}
+              style={{
+                transform:  isMenuOpen ? 'translateY(6.5px) rotate(45deg)' : 'translateY(0px) rotate(0deg)',
+                transition: 'transform 0.4s cubic-bezier(0.87,0,0.13,1)',
+              }}
             />
-            <motion.span
+            <span
               className="block w-4 h-[1.5px] bg-zinc-300"
-              animate={{ opacity: isMenuOpen ? 0 : 1 }}
-              transition={{ duration: 0.2 }}
+              style={{
+                opacity:    isMenuOpen ? 0 : 1,
+                transition: 'opacity 0.2s ease',
+              }}
             />
-            <motion.span
+            <span
               className="block w-4 h-[1.5px] bg-zinc-300 origin-center"
-              animate={{ rotate: isMenuOpen ? -45 : 0, y: isMenuOpen ? -6.5 : 0 }}
-              transition={{ duration: 0.4, ease: [0.87, 0, 0.13, 1] }}
+              style={{
+                transform:  isMenuOpen ? 'translateY(-6.5px) rotate(-45deg)' : 'translateY(0px) rotate(0deg)',
+                transition: 'transform 0.4s cubic-bezier(0.87,0,0.13,1)',
+              }}
             />
-          </motion.button>
-        </motion.nav>
+          </button>
+        </nav>
       </div>
 
       {isMenuOpen && (

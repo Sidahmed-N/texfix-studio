@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { motion } from "motion/react"
 
 type AnimatedBadgeProps = {
   text?: string
@@ -32,19 +31,7 @@ const AnimatedBadge = ({
   href,
 }: AnimatedBadgeProps) => {
   const content = (
-    <motion.div
-      initial={false}
-      whileInView={{
-        opacity: 1,
-        y: 0,
-        filter: "blur(0px)",
-      }}
-      transition={{
-        duration: 0.3,
-        delay: 0.1,
-        ease: "easeInOut",
-      }}
-      viewport={{ once: true }}
+    <div
       className="group relative flex max-w-fit items-center justify-center gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-1.5 text-zinc-300 backdrop-blur-sm"
       style={{
         boxShadow: '0 1px 0 0 rgba(255,255,255,0.08) inset, 0 -1px 0 0 rgba(0,0,0,0.4) inset, 0 4px 12px rgba(0,0,0,0.4)',
@@ -88,7 +75,7 @@ const AnimatedBadge = ({
         </svg>
       </div>
       <span className="bg-clip-text text-xs font-medium">{text}</span>
-    </motion.div>
+    </div>
   )
   return (
     <>

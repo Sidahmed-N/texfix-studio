@@ -14,6 +14,15 @@ export default function CustomCursor() {
     let mouseX = 0, mouseY = 0, curX = 0, curY = 0
     let rafId: number
     let started = false
+    let isIdle = false
+    let idleTimer: ReturnType<typeof setTimeout>
+
+    const startLoop = () => {
+      if (isIdle) {
+        isIdle = false
+        rafId = requestAnimationFrame(animate)
+      }
+    }
 
     const onMove = (e: MouseEvent) => {
       mouseX = e.clientX
@@ -31,9 +40,14 @@ export default function CustomCursor() {
         card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`)
         card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`)
       })
+
+      startLoop()
+      clearTimeout(idleTimer)
+      idleTimer = setTimeout(() => { isIdle = true }, 3000)
     }
 
     const animate = () => {
+      if (isIdle) return
       curX += (mouseX - curX) * 0.07
       curY += (mouseY - curY) * 0.07
       circle.style.transform = `translate(${curX}px, ${curY}px) translate(-50%, -50%)`
@@ -85,6 +99,7 @@ export default function CustomCursor() {
       document.removeEventListener('mouseover', onDelegatedEnter)
       document.removeEventListener('mouseout', onDelegatedLeave)
       cancelAnimationFrame(rafId)
+      clearTimeout(idleTimer)
     }
   }, [])
 

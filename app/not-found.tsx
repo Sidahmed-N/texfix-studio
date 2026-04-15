@@ -81,7 +81,6 @@ export default function NotFound() {
             fontVariationSettings: '"wght" 800',
             fontSize: 'clamp(4rem, 12vw, 9rem)',
             lineHeight: 1,
-            animation: 'wordReveal 1.2s cubic-bezier(0.16,1,0.3,1) 0.1s both',
           }}
         >
           404
@@ -89,7 +88,7 @@ export default function NotFound() {
 
         <p
           className="text-zinc-400 font-sans text-sm leading-relaxed max-w-sm"
-          style={{ animation: 'wordReveal 1.2s cubic-bezier(0.16,1,0.3,1) 0.35s both' }}
+
         >
           The page you are looking for does not exist or has been moved.
           Let&apos;s get you back on track.
@@ -97,7 +96,7 @@ export default function NotFound() {
 
         <div
           className="flex flex-col sm:flex-row items-center gap-4 mt-2"
-          style={{ animation: 'wordReveal 1.2s cubic-bezier(0.16,1,0.3,1) 0.55s both' }}
+
         >
           <AnimatedShinyButton url="/">
             Back to Home

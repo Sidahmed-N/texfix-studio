@@ -5,15 +5,6 @@ import gsap from 'gsap'
 import { IconCloud } from '@/components/ui/icon-cloud'
 import { AnimatedShinyButton } from '@/components/ui/animated-shiny-button'
 import { useReveal } from '@/hooks/use-reveal'
-import type React from 'react'
-
-function wordStyle(visible: boolean, delay: number): React.CSSProperties {
-  return {
-    display:   'block',
-    opacity:    visible ? 1 : 0,
-    animation:  visible ? `wordReveal 1.6s cubic-bezier(0.16,1,0.3,1) ${delay}s both` : 'none',
-  }
-}
 
 const SERVICES = [
   {
@@ -114,8 +105,6 @@ export default function AboutPage() {
     return () => observer.disconnect()
   }, [])
 
-  const { ref: revealStatement, visible: visStatement } = useReveal(0.15)
-  const { ref: revealTech,      visible: visTech }      = useReveal(0.15)
   const { ref: revealServices,  visible: visServices }  = useReveal(0.15)
 
   useEffect(() => {
@@ -126,17 +115,6 @@ export default function AboutPage() {
       { opacity: 1, duration: 1.4, ease: 'power2.out', stagger: 0.12, delay: 0.15, clearProps: 'opacity' }
     )
   }, [visServices])
-  const { ref: revealWhy,       visible: visWhy }       = useReveal(0.15)
-  const { ref: revealCta,       visible: visCta }       = useReveal(0.15)
-
-  const fadeUp = (visible: boolean, delay = 0) => ({
-    opacity:    visible ? 1 : 0,
-    transform:  visible ? 'none' : 'translateY(24px)',
-    transition: visible
-      ? `opacity 1.4s cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 1.4s cubic-bezier(0.16,1,0.3,1) ${delay}s`
-      : 'none',
-  })
-
   const handleServiceClick = (i: number) => {
     const next = openService === i ? null : i
     setOpenService(next)
@@ -185,7 +163,6 @@ export default function AboutPage() {
                         }`}
                         style={{
                           fontSize: 'clamp(3.2rem, 8.5vw, 7.5rem)',
-                          animation: `wordReveal 1.6s cubic-bezier(0.16,1,0.3,1) ${delay}s both`,
                         }}
                       >
                         {word}
@@ -203,7 +180,7 @@ export default function AboutPage() {
       </section>
 
       {/* Statement section */}
-      <section ref={revealStatement} className="px-8 md:px-16 lg:px-28 pb-32">
+      <section className="px-8 md:px-16 lg:px-28 pb-32">
         <div className="ml-[50%] h-[2px] bg-white mb-16" />
 
         <div className="ml-[50%] max-w-[600px]">
@@ -216,18 +193,16 @@ export default function AboutPage() {
               'digital products. We work with startups and businesses that want to go further, building',
               'web apps, AI tools and platforms that are both beautiful and fast.',
             ].map((line, i) => (
-              <span key={i} style={{ display: 'block', overflow: 'hidden' }}>
-                <span className="block" style={wordStyle(visStatement, i * 0.22)}>{line}</span>
-              </span>
+            <span key={i} className="block">{line}</span>
             ))}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-10">
-            <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[320px]" style={fadeUp(visStatement, 0.75)}>
+            <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[320px]">
               We are a small, focused team based in Guelma, Algeria. Every project we take on gets
               our full attention, no handoffs, no bloat. Just sharp execution from start to launch.
             </p>
-            <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[320px]" style={fadeUp(visStatement, 1.0)}>
+            <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[320px]">
               We are always open to new projects and collaborations. If you have an idea you want
               to bring to life, reach out at{' '}
               <a href="mailto:texfix.info@gmail.com" className="text-zinc-300 hover:text-white transition-colors">
@@ -240,8 +215,8 @@ export default function AboutPage() {
       </section>
 
       {/* Tech stack section */}
-      <section ref={revealTech} className="px-8 md:px-16 lg:px-28 pb-32">
-        <div className="flex items-center gap-3 mb-6" style={fadeUp(visTech)}>
+      <section className="px-8 md:px-16 lg:px-28 pb-32">
+        <div className="flex items-center gap-3 mb-6">
           <span className="text-zinc-500 font-sans text-xs uppercase tracking-[0.3em]">Tech Stacks</span>
         </div>
         <div className="mr-[50%] h-[2px] bg-white mb-16" />
@@ -256,18 +231,16 @@ export default function AboutPage() {
                 'We work with modern, proven technologies. Our stack is chosen for speed, scalability',
                 'and long-term maintainability.',
               ].map((line, i) => (
-                <span key={i} style={{ display: 'block', overflow: 'hidden' }}>
-                  <span className="block" style={wordStyle(visTech, i * 0.22)}>{line}</span>
-                </span>
+                <span key={i} className="block">{line}</span>
               ))}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-10">
-              <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[320px]" style={fadeUp(visTech, 0.55)}>
+              <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[320px]">
                 On the frontend we use React, Next.js and TypeScript. For styling we lean on Tailwind CSS,
                 and for animation we use GSAP and Framer Motion.
               </p>
-              <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[320px]" style={fadeUp(visTech, 0.8)}>
+              <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[320px]">
                 On the backend we work with Node.js, Python and PostgreSQL. For AI features we integrate
                 OpenAI and custom model pipelines depending on the project.
               </p>
@@ -291,7 +264,7 @@ export default function AboutPage() {
       {/* Services section */}
       <section ref={revealServices} className="px-8 md:px-16 lg:px-28 pb-32">
         <div className="max-w-[700px] mx-auto">
-          <div className="flex items-center gap-3 mb-6" style={fadeUp(visServices)}>
+          <div className="flex items-center gap-3 mb-6">
             <span className="text-zinc-500 font-sans text-xs uppercase tracking-[0.3em]">Our Services</span>
           </div>
           <div className="h-[2px] bg-white mb-16 -mr-32 md:-mr-64 lg:-mr-96" />
@@ -303,9 +276,7 @@ export default function AboutPage() {
               'From idea to launch, we cover the full spectrum',
               'of digital product development.',
             ].map((line, i) => (
-              <span key={i} style={{ display: 'block', overflow: 'hidden' }}>
-                <span className="block" style={wordStyle(visServices, i * 0.22)}>{line}</span>
-              </span>
+                <span key={i} className="block">{line}</span>
             ))}
           </p>
 
@@ -366,8 +337,8 @@ export default function AboutPage() {
       </section>
 
       {/* Why Choose Us section */}
-      <section ref={revealWhy} className="px-8 md:px-16 lg:px-28 pb-32">
-        <div className="flex items-center gap-3 mb-6" style={fadeUp(visWhy)}>
+      <section className="px-8 md:px-16 lg:px-28 pb-32">
+        <div className="flex items-center gap-3 mb-6">
           <span className="text-zinc-500 font-sans text-xs uppercase tracking-[0.3em]">Why Choose Us</span>
         </div>
         <div className="mr-[50%] h-[2px] bg-white mb-16" />
@@ -381,19 +352,17 @@ export default function AboutPage() {
               'We are not an agency. We are a small team',
               'that genuinely cares about what we ship.',
             ].map((line, i) => (
-              <span key={i} style={{ display: 'block', overflow: 'hidden' }}>
-                <span className="block" style={wordStyle(visWhy, i * 0.22)}>{line}</span>
-              </span>
+                <span key={i} className="block">{line}</span>
             ))}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-10 mb-16">
-            <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[280px]" style={fadeUp(visWhy, 0.55)}>
+            <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[280px]">
               Every project gets our full attention from day one. No handoffs, no account managers.
               You work directly with the people building your product, which means faster decisions
               and sharper execution all the way to launch.
             </p>
-            <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[280px]" style={fadeUp(visWhy, 0.8)}>
+            <p className="text-zinc-500 font-sans text-sm leading-relaxed max-w-[280px]">
               We write code built to last. Clean architecture, no unnecessary bloat, and transparent
               communication throughout. You always know what we are building, why we made a decision,
               and what is coming next.
@@ -424,35 +393,31 @@ export default function AboutPage() {
       </section>
 
       {/* CTA section */}
-      <section ref={revealCta} className="px-8 md:px-16 lg:px-28 pb-40">
+      <section className="px-8 md:px-16 lg:px-28 pb-40">
         <div className="max-w-[700px] mx-auto text-center">
           <div className="h-[2px] bg-white mb-16" />
           <h2
             className="font-bold leading-[0.9] tracking-tighter uppercase mb-6"
             style={{ fontFamily: 'var(--font-hero)', fontVariationSettings: '"wght" 632' }}
           >
-            <span style={{ display: 'block', overflow: 'hidden' }}>
-              <span
-                className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500"
-                style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', ...wordStyle(visCta, 0) }}
-              >
-                Let&apos;s Build
-              </span>
+            <span
+              className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500"
+              style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)' }}
+            >
+              Let&apos;s Build
             </span>
-            <span style={{ display: 'block', overflow: 'hidden' }}>
-              <span
-                className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-600 to-indigo-900"
-                style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', ...wordStyle(visCta, 0.15) }}
-              >
-                Something Great
-              </span>
+            <span
+              className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-600 to-indigo-900"
+              style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)' }}
+            >
+              Something Great
             </span>
           </h2>
-          <p className="text-zinc-400 text-base leading-relaxed mb-10 max-w-md mx-auto" style={fadeUp(visCta, 0.35)}>
+          <p className="text-zinc-400 text-base leading-relaxed mb-10 max-w-md mx-auto">
             Ready to turn your idea into a product that scales?<br />
             Let&apos;s talk — no commitment required.
           </p>
-          <div style={fadeUp(visCta, 0.5)}>
+          <div>
             <AnimatedShinyButton url="/contact">
               Get in Touch
             </AnimatedShinyButton>

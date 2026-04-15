@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
+import Image from 'next/image'
 import AnimatedBadge from '@/components/ui/animated-badge'
-import { useReveal, wordStyle } from '@/hooks/use-reveal'
 
 const projects = [
   {
@@ -39,55 +38,59 @@ export default function Projects() {
   const containerRef = useRef<HTMLDivElement>(null)
   const thumbnailRef = useRef<HTMLDivElement>(null)
   const thumbnailsRef = useRef<HTMLDivElement[]>([])
-  const { ref: revealRef, visible } = useReveal(0.2)
 
   useEffect(() => {
     if (!window.matchMedia('(pointer: fine)').matches) return
     const thumbnail = thumbnailRef.current
     if (!thumbnail) return
-
-    gsap.set(thumbnail, { scale: 0, xPercent: -50, yPercent: -50 })
-
-    const xTo = gsap.quickTo(thumbnail, 'x', { duration: 0.4, ease: 'power3.out' })
-    const yTo = gsap.quickTo(thumbnail, 'y', { duration: 0.4, ease: 'power3.out' })
-
     const container = containerRef.current
     if (!container) return
 
-    let firstMove = true
-    const onMouseMove = (e: MouseEvent) => {
-      if (firstMove) {
-        gsap.set(thumbnail, { x: e.clientX, y: e.clientY })
-        firstMove = false
+    let cleanup: (() => void) | undefined
+
+    import('gsap').then(({ gsap }) => {
+      gsap.set(thumbnail, { scale: 0, xPercent: -50, yPercent: -50 })
+
+      const xTo = gsap.quickTo(thumbnail, 'x', { duration: 0.4, ease: 'power3.out' })
+      const yTo = gsap.quickTo(thumbnail, 'y', { duration: 0.4, ease: 'power3.out' })
+
+      let firstMove = true
+      const onMouseMove = (e: MouseEvent) => {
+        if (firstMove) {
+          gsap.set(thumbnail, { x: e.clientX, y: e.clientY })
+          firstMove = false
+        }
+        xTo(e.clientX)
+        yTo(e.clientY)
       }
-      xTo(e.clientX)
-      yTo(e.clientY)
-    }
 
-    const onMouseLeave = () => {
-      gsap.to(thumbnail, { scale: 0, duration: 0.3, ease: 'power2.out', overwrite: 'auto' })
-    }
+      const onMouseLeave = () => {
+        gsap.to(thumbnail, { scale: 0, duration: 0.3, ease: 'power2.out', overwrite: 'auto' })
+      }
 
-    container.addEventListener('mousemove', onMouseMove)
-    container.addEventListener('mouseleave', onMouseLeave)
+      container.addEventListener('mousemove', onMouseMove)
+      container.addEventListener('mouseleave', onMouseLeave)
 
-    const rows = container.querySelectorAll<HTMLDivElement>('.project-row')
-    rows.forEach((row, index) => {
-      row.addEventListener('mouseenter', () => {
-        gsap.to(thumbnail, { scale: 1, duration: 0.4, ease: 'power2.out', overwrite: 'auto' })
-        gsap.to(thumbnailsRef.current, {
-          yPercent: -100 * index,
-          duration: 0.4,
-          ease: 'power2.out',
-          overwrite: 'auto',
+      const rows = container.querySelectorAll<HTMLDivElement>('.project-row')
+      rows.forEach((row, index) => {
+        row.addEventListener('mouseenter', () => {
+          gsap.to(thumbnail, { scale: 1, duration: 0.4, ease: 'power2.out', overwrite: 'auto' })
+          gsap.to(thumbnailsRef.current, {
+            yPercent: -100 * index,
+            duration: 0.4,
+            ease: 'power2.out',
+            overwrite: 'auto',
+          })
         })
       })
+
+      cleanup = () => {
+        container.removeEventListener('mousemove', onMouseMove)
+        container.removeEventListener('mouseleave', onMouseLeave)
+      }
     })
 
-    return () => {
-      container.removeEventListener('mousemove', onMouseMove)
-      container.removeEventListener('mouseleave', onMouseLeave)
-    }
+    return () => { cleanup?.() }
   }, [])
 
   return (
@@ -97,24 +100,11 @@ export default function Projects() {
         <div className="flex justify-center mb-2">
           <AnimatedBadge text="Selected Work" color="#3B82F6" />
         </div>
-        {/* @ts-expect-error ref typing */}
-        <h2 ref={revealRef} className="font-display text-4xl font-medium uppercase">
-          <span className="block">
-            {["Projects", "We're"].map((w, i) => (
-              <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500" style={wordStyle(visible, i * 0.12)}>{w}</span>
-              </span>
-            ))}
-          </span>
-          <span className="block">
-            {['Proud', 'Of'].map((w, i) => (
-              <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                <span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700" style={wordStyle(visible, 0.24 + i * 0.12)}>{w}</span>
-              </span>
-            ))}
-          </span>
+        <h2 className="font-display text-4xl font-medium uppercase">
+          <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">Projects We&apos;re</span>
+          <span className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700">Proud Of</span>
         </h2>
-        <p className="mt-4 text-zinc-400 text-sm max-w-xl mx-auto" style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(20px)', transition: visible ? 'opacity 0.8s ease 0.6s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s' : 'none' }}>
+        <p className="mt-4 text-zinc-400 text-sm max-w-xl mx-auto">
           A curated selection of software products we&apos;ve designed and engineered — from MVPs to full-scale enterprise platforms.
         </p>
       </div>
@@ -154,14 +144,16 @@ export default function Projects() {
           {projects.map((project, i) => (
             <div
               key={i}
-              className="w-full h-full flex-shrink-0"
+              className="w-full h-full flex-shrink-0 relative"
               ref={(el) => { if (el) thumbnailsRef.current[i] = el }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={project.image}
                 alt={project.title}
-                className="w-full h-full object-cover"
+                fill
+                sizes="352px"
+                className="object-cover"
+                loading="lazy"
               />
             </div>
           ))}

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { AnimatedList } from '@/components/ui/animated-list'
 import AnimatedBadge from '@/components/ui/animated-badge'
-import { useReveal, wordStyle } from '@/hooks/use-reveal'
+
 
 const notifications = [
   { name: 'Requirements', message: 'Project scope document ready', time: '2m ago' },
@@ -385,7 +385,6 @@ function CardShell({ children }: { children: React.ReactNode }) {
 }
 
 export default function Process() {
-  const { ref: revealRef, visible } = useReveal(0.2)
   return (
     <section id="process" className="py-28 relative bg-black/60">
       {/* Background */}
@@ -399,24 +398,11 @@ export default function Process() {
           <div className="flex justify-center mb-2">
             <AnimatedBadge text="Methodology" color="#3B82F6" />
           </div>
-          {/* @ts-expect-error ref typing */}
-          <h2 ref={revealRef} className="font-display text-4xl font-medium uppercase">
-            <span className="block">
-              {['Our'].map((w, i) => (
-                <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500" style={wordStyle(visible, i * 0.12)}>{w}</span>
-                </span>
-              ))}
-            </span>
-            <span className="block">
-              {['Development', 'Process'].map((w, i) => (
-                <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700" style={wordStyle(visible, 0.12 + i * 0.12)}>{w}</span>
-                </span>
-              ))}
-            </span>
+          <h2 className="font-display text-4xl font-medium uppercase">
+            <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">Our</span>
+            <span className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700">Development Process</span>
           </h2>
-          <p className="mt-4 text-zinc-400 text-sm max-w-xl mx-auto" style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(20px)', transition: visible ? 'opacity 0.8s ease 0.6s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s' : 'none' }}>
+          <p className="mt-4 text-zinc-400 text-sm max-w-xl mx-auto">
             From discovery to deployment, every project follows a structured, transparent process — so you always know what's being built, why, and when it ships.
           </p>
         </div>

@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export default function Preloader() {
   const [mounted, setMounted] = useState(true)
+  const tlRef = useRef<gsap.core.Timeline | null>(null)
 
   useEffect(() => {
     // Only show preloader once per browser session
@@ -20,10 +21,13 @@ export default function Preloader() {
     document.documentElement.style.paddingRight = `${scrollbarWidth}px`
     document.body.style.overflow = 'hidden'
 
+    let cancelled = false
     const init = async () => {
       const { gsap } = await import('gsap')
       const { SplitText } = await import('gsap/SplitText')
       const { CustomEase } = await import('gsap/CustomEase')
+
+      if (cancelled) return
 
       gsap.registerPlugin(CustomEase, SplitText)
       CustomEase.create('hop', '.8, 0, .3, 1')
@@ -82,10 +86,11 @@ export default function Preloader() {
 
       // Hide site content until preloader reveals it
       gsap.set('.site-container', { clipPath: 'polygon(0 48%, 0 48%, 0 52%, 0 52%)' })
-      // Now everything is positioned correctly — make layers visible
-      gsap.set(['.preloader', '.split-overlay', '.tags-overlay'], { opacity: 1 })
+      // All chars are now positioned — make text visible before timeline starts
+      gsap.set(['.preloader h1', '.split-overlay h1', '.tags-overlay p'], { opacity: 1 })
 
       const tl = gsap.timeline({ defaults: { ease: 'hop' } })
+      tlRef.current = tl
       const tags = gsap.utils.toArray<Element>('.tag')
 
       tags.forEach((tag, index) => {
@@ -122,15 +127,19 @@ export default function Preloader() {
         tl.to(tag.querySelectorAll('p .word'), { y: '100%', duration: 0.75 }, 5 + index * 0.1)
       })
 
-      tl.to(['.preloader', '.split-overlay'], { y: (i: number) => (i === 0 ? '-50%' : '50%'), duration: 1 }, 5.25)
+      tl.to(['.preloader', '.split-overlay'], { y: (i: number) => (i === 0 ? '-50%' : '50%'), duration: 1, force3D: true }, 5.25)
         .to(
           '.site-container',
           {
             clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
             duration: 1,
-            onComplete: () => {
-              document.body.style.overflow = ''
+            onStart: () => {
+              // Remove padding compensation before content is visible — prevents
+              // the rightward layout shift caused by the scrollbar reappearing
               document.documentElement.style.paddingRight = ''
+              document.body.style.overflow = ''
+            },
+            onComplete: () => {
               document.body.classList.remove('preloader-active')
               window.dispatchEvent(new Event('preloader-done'))
               gsap.set(['.preloader', '.split-overlay', '.tags-overlay'], { display: 'none' })
@@ -142,6 +151,12 @@ export default function Preloader() {
     }
 
     init()
+
+    return () => {
+      cancelled = true
+      tlRef.current?.kill()
+    }
+
   }, [])
 
   if (!mounted) return null

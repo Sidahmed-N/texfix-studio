@@ -93,7 +93,6 @@ export default function PrivacyPage() {
                         }`}
                         style={{
                           fontSize: 'clamp(3rem, 8vw, 7rem)',
-                          animation: `wordReveal 1.6s cubic-bezier(0.16,1,0.3,1) ${delay}s both`,
                         }}
                       >
                         {word}
@@ -107,7 +106,7 @@ export default function PrivacyPage() {
 
           <p
             className="mt-8 text-zinc-500 font-sans text-sm leading-relaxed max-w-xl"
-            style={{ animation: 'wordReveal 1.2s cubic-bezier(0.16,1,0.3,1) 0.55s both' }}
+
           >
             Simple and honest. We only collect what we need to get back to you about your project.
           </p>

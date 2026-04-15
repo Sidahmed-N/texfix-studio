@@ -1,12 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import type React from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Image from 'next/image'
 import { AnimatedShinyButton } from '@/components/ui/animated-shiny-button'
-import { useReveal } from '@/hooks/use-reveal'
 
 const TITLE_LINES = [
   ['IDEAS', 'THAT'],
@@ -178,8 +176,9 @@ export default function WorkPage() {
     container.addEventListener('mouseleave', onMouseLeave)
 
     const rows = container.querySelectorAll<HTMLDivElement>('.project-row-header')
+    const rowHandlers: Array<[HTMLDivElement, () => void]> = []
     rows.forEach((row, index) => {
-      row.addEventListener('mouseenter', () => {
+      const fn = () => {
         gsap.to(thumbnail, { scale: 1, duration: 0.4, ease: 'power2.out', overwrite: 'auto' })
         gsap.to(thumbnailsRef.current, {
           yPercent: -100 * index,
@@ -187,12 +186,15 @@ export default function WorkPage() {
           ease: 'power2.out',
           overwrite: 'auto',
         })
-      })
+      }
+      row.addEventListener('mouseenter', fn)
+      rowHandlers.push([row, fn])
     })
 
     return () => {
       container.removeEventListener('mousemove', onMouseMove)
       container.removeEventListener('mouseleave', onMouseLeave)
+      rowHandlers.forEach(([row, fn]) => row.removeEventListener('mouseenter', fn))
     }
   }, [])
 
@@ -233,7 +235,6 @@ export default function WorkPage() {
                         }`}
                         style={{
                           fontSize: 'clamp(3.2rem, 8.5vw, 7.5rem)',
-                          animation: `wordReveal 1.6s cubic-bezier(0.16,1,0.3,1) ${delay}s both`,
                         }}
                       >
                         {word}
@@ -388,52 +389,32 @@ export default function WorkPage() {
 }
 
 function CtaSection() {
-  const { ref: revealCta, visible: visCta } = useReveal(0.15)
-
-  const wordStyle = (delay: number): React.CSSProperties => ({
-    display: 'block',
-    opacity: visCta ? 1 : 0,
-    animation: visCta ? `wordReveal 1.6s cubic-bezier(0.16,1,0.3,1) ${delay}s both` : 'none',
-  })
-
-  const fadeUp = (delay = 0) => ({
-    opacity: visCta ? 1 : 0,
-    transform: visCta ? 'none' : 'translateY(24px)',
-    transition: visCta
-      ? `opacity 1.4s cubic-bezier(0.16,1,0.3,1) ${delay}s, transform 1.4s cubic-bezier(0.16,1,0.3,1) ${delay}s`
-      : 'none',
-  })
-
   return (
-    <section ref={revealCta} className="px-8 md:px-16 lg:px-28 pb-40 pt-32">
+    <section className="px-8 md:px-16 lg:px-28 pb-40 pt-32">
       <div className="max-w-[700px] mx-auto text-center">
         <div className="h-[2px] bg-white mb-16" />
         <h2
           className="font-bold leading-[0.9] tracking-tighter uppercase mb-6"
           style={{ fontFamily: 'var(--font-hero)', fontVariationSettings: '"wght" 632' }}
         >
-          <span style={{ display: 'block', overflow: 'hidden' }}>
-            <span
-              className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500"
-              style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', ...wordStyle(0) }}
-            >
-              Let&apos;s Build
-            </span>
+          <span
+            className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500"
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)' }}
+          >
+            Let&apos;s Build
           </span>
-          <span style={{ display: 'block', overflow: 'hidden' }}>
-            <span
-              className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-600 to-indigo-900"
-              style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', ...wordStyle(0.15) }}
-            >
-              Something Great
-            </span>
+          <span
+            className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-600 to-indigo-900"
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)' }}
+          >
+            Something Great
           </span>
         </h2>
-        <p className="text-zinc-400 text-base leading-relaxed mb-10 max-w-md mx-auto" style={fadeUp(0.35)}>
+        <p className="text-zinc-400 text-base leading-relaxed mb-10 max-w-md mx-auto">
           Ready to turn your idea into a product that scales?<br />
           Let&apos;s talk — no commitment required.
         </p>
-        <div style={fadeUp(0.5)}>
+        <div>
           <AnimatedShinyButton url="/contact">
             Get in Touch
           </AnimatedShinyButton>

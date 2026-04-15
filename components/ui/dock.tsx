@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 /* ─── Context ──────────────────────────────────────────────── */
@@ -67,12 +67,19 @@ interface DockIconProps {
 
 export function DockIcon({ children, className, href, target, rel, title }: DockIconProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const boundsRef = useRef<DOMRect | null>(null)
   const { mouseX, magnification, distance } = useContext(DockContext)
 
+  useEffect(() => {
+    const update = () => { boundsRef.current = ref.current?.getBoundingClientRect() ?? null }
+    update()
+    window.addEventListener('resize', update, { passive: true })
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
   const getWidth = () => {
-    if (!ref.current || mouseX === Infinity) return 36
-    const bounds = ref.current.getBoundingClientRect()
-    const dist = mouseX - bounds.x - bounds.width / 2
+    if (!boundsRef.current || mouseX === Infinity) return 36
+    const dist = mouseX - boundsRef.current.x - boundsRef.current.width / 2
     if (Math.abs(dist) < distance) {
       return (1 - Math.abs(dist) / distance) * magnification + 36
     }

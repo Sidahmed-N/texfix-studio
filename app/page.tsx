@@ -1,11 +1,13 @@
+import dynamic from 'next/dynamic'
 import Hero from '@/components/sections/Hero'
-import About from '@/components/sections/About'
 import Services from '@/components/sections/Services'
-import Projects from '@/components/sections/Projects'
-import Process from '@/components/sections/Process'
-import Testimonials from '@/components/sections/Testimonials'
-import Contact from '@/components/sections/Contact'
 import ScrollToSection from '@/components/ScrollToSection'
+
+const About       = dynamic(() => import('@/components/sections/About'))
+const Projects    = dynamic(() => import('@/components/sections/Projects'))
+const Process     = dynamic(() => import('@/components/sections/Process'))
+const Testimonials = dynamic(() => import('@/components/sections/Testimonials'))
+const Contact     = dynamic(() => import('@/components/sections/Contact'))
 
 export default function Home() {
   return (

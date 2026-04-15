@@ -1,6 +1,8 @@
 'use client'
+import { useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
-import { useReveal, wordStyle } from '@/hooks/use-reveal'
+import { Activity, Globe, Layers, Share2 } from 'lucide-react'
+
 import { cn } from '@/lib/utils'
 import { BentoGrid, BentoCard } from '@/components/ui/bento-grid'
 import { AnimatedList } from '@/components/ui/animated-list'
@@ -184,7 +186,7 @@ function UptimeBg() {
 // â”€â”€ Feature definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const features = [
   {
-    icon: 'lucide:activity',
+    icon: <Activity className="h-12 w-12" />,
     name: 'Always Shipping',
     description:
       'Continuous delivery, total visibility — every sprint, every deploy, every win.',
@@ -194,7 +196,7 @@ const features = [
     background: <AnimatedListBg />,
   },
   {
-    icon: 'lucide:globe',
+    icon: <Globe className="h-12 w-12" />,
     name: 'Available Worldwide',
     description:
       'We work with clients across every timezone — remote-first, async-ready, always reachable wherever you are.',
@@ -204,7 +206,7 @@ const features = [
     background: <GlobeBg />,
   },
   {
-    icon: 'lucide:layers',
+    icon: <Layers className="h-12 w-12" />,
     name: 'Full-Stack Expertise',
     description:
       'React, Next.js, Node, TypeScript, PostgreSQL, AWS and more — your entire stack, mastered.',
@@ -214,7 +216,7 @@ const features = [
     background: <TechGridBg />,
   },
   {
-    icon: 'lucide:share-2',
+    icon: <Share2 className="h-12 w-12" />,
     name: 'Seamless Integrations',
     description:
       'Client brief in — Next.js, React, AI and cloud deployments out. We connect your vision to the full modern stack.',
@@ -227,7 +229,23 @@ const features = [
 
 // â”€â”€ Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export default function About() {
-  const { ref: revealRef, visible } = useReveal(0.2)
+  const marqueeRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = marqueeRef.current
+    if (!el) return
+    const content = el.querySelector<HTMLElement>('.marquee-content')
+    if (!content) return
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        content.style.animationPlayState = entry.isIntersecting ? 'running' : 'paused'
+      },
+      { threshold: 0 },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
   return (
     <section id="about" className="py-24 border-y border-zinc-900 bg-zinc-950/50 relative">
       {/* Ambient glows */}
@@ -243,25 +261,12 @@ export default function About() {
             <div className="flex justify-center mb-2">
               <AnimatedBadge text="Philosophy" color="#3B82F6" />
             </div>
-            {/* @ts-expect-error ref typing */}
-            <h2 ref={revealRef} className="text-4xl font-medium leading-tight uppercase">
-              <span className="block">
-                {['Engineered', 'for'].map((w, i) => (
-                  <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                    <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500" style={wordStyle(visible, i * 0.12)}>{w}</span>
-                  </span>
-                ))}
-              </span>
-              <span className="block">
-                {['Growth'].map((w, i) => (
-                  <span key={w} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-                    <span className="bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700" style={wordStyle(visible, 0.24 + i * 0.12)}>{w}</span>
-                  </span>
-                ))}
-              </span>
+            <h2 className="text-4xl font-medium leading-tight uppercase">
+              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">Engineered for</span>
+              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-blue-400 via-blue-500 to-blue-700">Growth</span>
             </h2>
           </div>
-          <p className="text-xs text-zinc-400 max-w-sm" style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(20px)', transition: visible ? 'opacity 0.8s ease 0.6s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.6s' : 'none' }}>
+          <p className="text-xs text-zinc-400 max-w-sm">
             We don&apos;t just write code. We build digital infrastructure that scales with your
             ambition.
           </p>
@@ -276,7 +281,7 @@ export default function About() {
       </div>
 
       {/* Tech Marquee */}
-      <div className="py-6 bg-black/20 border-t border-zinc-800 relative overflow-hidden">
+      <div ref={marqueeRef} className="py-6 bg-black/20 border-t border-zinc-800 relative overflow-hidden">
         <div className="marquee-container">
           <div className="marquee-content gap-16 px-8">
             {[...techStack, ...techStack].map((item, i) => (

@@ -23,7 +23,7 @@ export function AnimatedGridPattern({
   x = -1,
   y = -1,
   strokeDasharray = 0,
-  numSquares = 50,
+  numSquares = 20,
   maxOpacity = 0.5,
   duration = 4,
   repeatDelay = 0.5,

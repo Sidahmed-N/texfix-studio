@@ -1,8 +1,6 @@
 ﻿'use client'
 
 import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const PILLS = [
   { label: 'Web Apps',        top: 25,   left: 15   },
@@ -24,117 +22,134 @@ export default function Contact() {
   const titleRef     = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger)
+    let st: ReturnType<Awaited<typeof import('gsap/ScrollTrigger')>['ScrollTrigger']['create']> | undefined
+    let floats: ReturnType<typeof import('gsap').gsap.to>[] = []
+    let onResize: (() => void) | undefined
+    let cancelled = false
 
-    // Measure pill natural sizes
-    const pillSizes = pillBoxRefs.current.map(el => {
-      const r = el.getBoundingClientRect()
-      return { width: r.width, height: r.height }
-    })
+    import('gsap').then(async ({ gsap }) => {
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      gsap.registerPlugin(ScrollTrigger)
 
-    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
-    const btnW = 3 * rem
-    const btnH = 3 * rem
+      if (cancelled) return
 
-    const getCtaRem = () => (window.innerWidth < 1000 ? 14 : 16)
-    let ctaRem = getCtaRem()
-
-    const onResize = () => { ctaRem = getCtaRem(); ScrollTrigger.refresh() }
-    window.addEventListener('resize', onResize)
-
-    // Floating idle animations
-    const floats = pillWrapRefs.current.map((el, i) =>
-      gsap.to(el, {
-        y: '+=28',
-        duration: 1.2 + 0.37 * (i % 0.8 === 0 ? 0.8 : i % 0.8),
-        delay: 0.53 * (i % 2),
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
+      // Measure pill natural sizes
+      const pillSizes = pillBoxRefs.current.map(el => {
+        const r = el.getBoundingClientRect()
+        return { width: r.width, height: r.height }
       })
-    )
 
-    // Tablets use touch scroll — tighter scrub reduces perceived lag
-    const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024
-    const scrubAmt = isTablet ? 0.3 : 1
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
+      const btnW = 3 * rem
+      const btnH = 3 * rem
 
-    const st = ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: 'top top',
-      end: `+=${3 * window.innerHeight}px`,
-      pin: true,
-      pinSpacing: true,
-      scrub: scrubAmt,
-      onUpdate(self) {
-        const p = self.progress
+      const getCtaRem = () => (window.innerWidth < 1000 ? 14 : 16)
+      let ctaRem = getCtaRem()
 
-        // — title parallax out
-        if (titleRef.current) {
-          gsap.set(titleRef.current, { y: p <= 0.3333 ? `${-(p / 0.3333) * 100}%` : '-100%' })
-        }
+      onResize = () => { ctaRem = getCtaRem(); ScrollTrigger.refresh() }
+      window.addEventListener('resize', onResize)
 
-        // Phase 1 (0–50%): pills converge to centre
-        if (p <= 0.5) {
-          const e = p / 0.5
-          pillWrapRefs.current.forEach((el, i) => {
-            gsap.set(el, {
-              top:  `${PILLS[i].top  + (50 - PILLS[i].top)  * e}%`,
-              left: `${PILLS[i].left + (50 - PILLS[i].left) * e}%`,
-            })
-          })
-          pillBoxRefs.current.forEach((el, i) => {
-            const s = pillSizes[i]
-            gsap.set(el, {
-              width:        `${s.width  + (btnW - s.width)  * e}px`,
-              height:       `${s.height + (btnH - s.height) * e}px`,
-              borderRadius: `${0.5 + 24.5 * e}rem`,
-              borderWidth:  `${0.125 + (0.35 - 0.125) * e}rem`,
-            })
-          })
-          gsap.set('.cta-pill-label', { opacity: p <= 0.1 ? 1 - p / 0.1 : 0 })
-        }
+      // Floating idle animations
+      floats = pillWrapRefs.current.map((el, i) =>
+        gsap.to(el, {
+          y: '+=28',
+          duration: 1.2 + 0.37 * (i % 0.8 === 0 ? 0.8 : i % 0.8),
+          delay: 0.53 * (i % 2),
+          ease: 'sine.inOut',
+          repeat: -1,
+          yoyo: true,
+        })
+      )
 
-        // Pills layer visibility
-        if (pillsLayerRef.current) {
-          gsap.set(pillsLayerRef.current, { opacity: p >= 0.5 ? 0 : 1 })
-        }
+      // Tablets use touch scroll — tighter scrub reduces perceived lag
+      const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024
+      const scrubAmt = isTablet ? 0.3 : 1
 
-        // — Blue button
-        if (buttonRef.current) {
-          gsap.set(buttonRef.current, { opacity: +(p >= 0.5) })
+      st = ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top top',
+        end: `+=${3 * window.innerHeight}px`,
+        pin: true,
+        pinSpacing: true,
+        scrub: scrubAmt,
+        invalidateOnRefresh: true,
+        onUpdate(self) {
+          const p = self.progress
 
-          if (p >= 0.5 && p <= 0.75) {
-            const e = (p - 0.5) / 0.25
-            gsap.set(buttonRef.current, {
-              width:     `${3 + (ctaRem - 3) * e}rem`,
-              height:    `${3 + 0.5 * e}rem`,
-              transform: `translate(-50%, ${-50 + 250 * e}%)`,
-            })
-            gsap.set('.cta-inner', { opacity: 0 })
-          } else if (p > 0.75) {
-            gsap.set(buttonRef.current, {
-              width:     `${ctaRem}rem`,
-              height:    '3.5rem',
-              transform: 'translate(-50%, 200%)',
-            })
+          // — title parallax out
+          if (titleRef.current) {
+            gsap.set(titleRef.current, { y: p <= 0.3333 ? `${-(p / 0.3333) * 100}%` : '-100%' })
           }
-        }
 
-        // — CTA text block
-        if (p >= 0.75) {
-          const e = (p - 0.75) / 0.25
-          gsap.set('.cta-inner', { opacity: e })
-          gsap.set(ctaRef.current, { y: -50 + 50 * e, opacity: e })
-        } else {
-          gsap.set(ctaRef.current, { y: -50, opacity: 0 })
-        }
-      },
+          // Phase 1 (0–50%): pills converge to centre
+          if (p <= 0.5) {
+            const e = p / 0.5
+            pillWrapRefs.current.forEach((el, i) => {
+              gsap.set(el, {
+                top:  `${PILLS[i].top  + (50 - PILLS[i].top)  * e}%`,
+                left: `${PILLS[i].left + (50 - PILLS[i].left) * e}%`,
+              })
+            })
+            pillBoxRefs.current.forEach((el, i) => {
+              const s = pillSizes[i]
+              gsap.set(el, {
+                width:        `${s.width  + (btnW - s.width)  * e}px`,
+                height:       `${s.height + (btnH - s.height) * e}px`,
+                borderRadius: `${0.5 + 24.5 * e}rem`,
+                borderWidth:  `${0.125 + (0.35 - 0.125) * e}rem`,
+              })
+            })
+            gsap.set('.cta-pill-label', { opacity: p <= 0.1 ? 1 - p / 0.1 : 0 })
+          }
+
+          // Pills layer visibility
+          if (pillsLayerRef.current) {
+            gsap.set(pillsLayerRef.current, { opacity: p >= 0.5 ? 0 : 1 })
+          }
+
+          // — Blue button
+          if (buttonRef.current) {
+            gsap.set(buttonRef.current, { opacity: +(p >= 0.5) })
+
+            if (p >= 0.5 && p <= 0.75) {
+              const e = (p - 0.5) / 0.25
+              gsap.set(buttonRef.current, {
+                width:     `${3 + (ctaRem - 3) * e}rem`,
+                height:    `${3 + 0.5 * e}rem`,
+                transform: `translate(-50%, ${-50 + 250 * e}%)`,
+              })
+              gsap.set('.cta-inner', { opacity: 0 })
+            } else if (p > 0.75) {
+              gsap.set(buttonRef.current, {
+                width:     `${ctaRem}rem`,
+                height:    '3.5rem',
+                transform: 'translate(-50%, 200%)',
+              })
+            }
+          }
+
+          // — CTA text block
+          if (p >= 0.75) {
+            const e = (p - 0.75) / 0.25
+            gsap.set('.cta-inner', { opacity: e })
+            gsap.set(ctaRef.current, { y: -50 + 50 * e, opacity: e })
+          } else {
+            gsap.set(ctaRef.current, { y: -50, opacity: 0 })
+          }
+        },
+      })
+
+      ScrollTrigger.refresh()
     })
 
     return () => {
-      st.kill()
+      cancelled = true
       floats.forEach(f => f.kill())
-      window.removeEventListener('resize', onResize)
+      if (onResize) window.removeEventListener('resize', onResize)
+      if (st) {
+        st.kill(true)
+        st = undefined
+      }
     }
   }, [])
 

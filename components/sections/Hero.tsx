@@ -1,4 +1,3 @@
-import { Icon } from '@iconify/react'
 import { AnimatedShinyButton } from '@/components/ui/animated-shiny-button'
 import LiveButton from '@/components/ui/live-button'
 import AnimatedBadge from '@/components/ui/animated-badge'
@@ -19,7 +18,7 @@ export default function Hero() {
 
       <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-6xl mx-auto">
         {/* Badge */}
-        <div className="mb-8 opacity-0 animate-[fadeInUp_0.8s_ease-out_1s_forwards] flex justify-center">
+        <div className="mb-8 flex justify-center">
           <AnimatedBadge
             text="Software Development Agency"
             color="#3B82F6"
@@ -30,15 +29,15 @@ export default function Hero() {
         <h1 className="font-bold leading-[0.95] tracking-tighter mb-6 mix-blend-screen relative hero-title" style={{ fontFamily: 'var(--font-hero)' }}>
           <span className="block text-[11vw] md:text-[5.5vw]">
             <span style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.2em' }}>
-              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500" style={{ animation: 'wordReveal 1.1s cubic-bezier(0.16,1,0.3,1) 0.1s both' }}>CUSTOM</span>
+              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">CUSTOM</span>
             </span>
             <span style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom' }}>
-              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500" style={{ animation: 'wordReveal 1.1s cubic-bezier(0.16,1,0.3,1) 0.28s both' }}>SOFTWARE</span>
+              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">SOFTWARE</span>
             </span>
           </span>
           <span className="block text-[11vw] md:text-[5.5vw]">
             <span style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom' }}>
-              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500" style={{ animation: 'wordReveal 1.1s cubic-bezier(0.16,1,0.3,1) 0.46s both' }}>SOLUTIONS</span>
+              <span className="block bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-zinc-500">SOLUTIONS</span>
             </span>
           </span>
         </h1>
@@ -48,7 +47,7 @@ export default function Hero() {
           <p className="text-xs md:text-sm text-zinc-400 text-center leading-relaxed" style={{ fontFamily: 'var(--font-hero)' }}>
             {['Custom', 'websites,', 'apps,', 'and', 'software', 'made', 'to', 'fit', 'your', 'vision.'].map((word, i) => (
               <span key={i} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.28em' }}>
-                <span className="block" style={{ animation: `wordReveal 1s cubic-bezier(0.16,1,0.3,1) ${0.1 + i * 0.07}s both` }}>
+                <span className="block">
                   {word}
                 </span>
               </span>
@@ -57,7 +56,7 @@ export default function Hero() {
             <span className="text-zinc-500">
               {['From', 'a', 'landing', 'page', 'to', 'a', 'full', 'SaaS', 'platform,', 'we', 'build', 'it', 'right.'].map((word, i) => (
                 <span key={i} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'bottom', marginRight: '0.28em' }}>
-                  <span className="block" style={{ animation: `wordReveal 1s cubic-bezier(0.16,1,0.3,1) ${0.66 + i * 0.05}s both` }}>
+                  <span className="block">
                     {word}
                   </span>
                 </span>
